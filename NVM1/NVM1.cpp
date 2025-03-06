@@ -124,6 +124,7 @@ element calculateContraction(vector<element> elements, element reflection, vecto
 
 int main()
 {
+	// start
 	double reflectionCoeff = 1;
 	double contractionCoeff = 0.5;
 	double expansionCoeff = 2;
