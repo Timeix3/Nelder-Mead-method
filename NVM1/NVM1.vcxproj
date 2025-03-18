@@ -128,13 +128,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="neldermead.cpp" />
     <ClCompile Include="NVM1.cpp" />
-    <ClCompile Include="tinyexpr.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="neldermead.h" />
-    <ClInclude Include="tinyexpr.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
