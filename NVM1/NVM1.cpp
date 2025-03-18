@@ -19,8 +19,7 @@ int main()
 	std::string functionHimmelblau = "(x1^2+x2-11)^2+(x1+x2^2-7)^2";
 	std::string function3Variables = "x1^2+x2^2+x3^2";
 	std::string chosenFunction = functionRosenbrock;
-	/*std::string chosenFunction;
-	getline(std::cin, chosenFunction);*/
+	//getline(std::cin, chosenFunction);
 
 	HMODULE NelderMeadLib;
 	NelderMeadLib = LoadLibrary(L"NelderMeadDll.dll");
