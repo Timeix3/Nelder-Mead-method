@@ -2,11 +2,11 @@
 #include <iostream>
 #include <vector>
 
-void print(std::vector<double> point) {
+void print(double* point, int size) {
 	std::cout << "X=(";
-	for (int i = 0; i < point.size(); i++) {
+	for (int i = 0; i < size; i++) {
 		std::cout << point[i];
-		if (i < point.size() - 1) std::cout << ", ";
+		if (i < size - 1) std::cout << ", ";
 	}
 	std::cout << ")";
 }
@@ -14,30 +14,31 @@ void print(std::vector<double> point) {
 int main()
 {
 	int varsCount = 2;
-	std::vector<double> startingPoint = { 0,0 };
+	std::vector<double> startingPoint2 = { 0,0 };
 	std::string functionRosenbrock = "(1-x1)^2+100*(x2-x1^2)^2";
 	std::string functionHimmelblau = "(x1^2+x2-11)^2+(x1+x2^2-7)^2";
 	std::string function3Variables = "x1^2+x2^2+x3^2";
-	std::string chosenFunction = functionRosenbrock;
-	//getline(std::cin, chosenFunction);
+	std::string chosenFunctionstr = functionRosenbrock;
 
+	char* chosenFunction = chosenFunctionstr.data();
+	double* startingPoint = startingPoint2.data();
 	HMODULE NelderMeadLib;
 	NelderMeadLib = LoadLibrary(L"NelderMeadDll.dll");
 	if (NelderMeadLib == NULL) std::cout << "dll not found";
 
-	typedef std::vector<double>(WINAPI* findFunctionMinimum)(int varsCount, std::vector<double> startingPoint, std::string function);
+	typedef double*(WINAPI* findFunctionMinimum)(int varsCount, double* startingPoint, char* function);
 	findFunctionMinimum functionMinimum;
 	functionMinimum = (findFunctionMinimum)GetProcAddress(NelderMeadLib, "findFunctionMinimum");
 	if (functionMinimum == nullptr) std::cout << "functionMinimum not found";
-	std::vector<double> point = functionMinimum(varsCount, startingPoint, chosenFunction);
+	double* point = functionMinimum(varsCount, startingPoint, functionRosenbrock.data());
 
-	typedef double(WINAPI* evaluateFunction)(std::vector<double> point, std::string function);
-	evaluateFunction functionEvaluate;
-	functionEvaluate = (evaluateFunction)GetProcAddress(NelderMeadLib, "evaluateFunction");
+	typedef double(WINAPI* evaluateFunctionImport)(double* point, int size, char* function);
+	evaluateFunctionImport functionEvaluate;
+	functionEvaluate = (evaluateFunctionImport)GetProcAddress(NelderMeadLib, "evaluateFunctionImport");
 	if (functionEvaluate == nullptr) std::cout << "functionEvaluate not found";
-	double value = functionEvaluate(point, chosenFunction);
+	double value = functionEvaluate(point, varsCount, functionRosenbrock.data());
 
-	print(point);
+	print(point, varsCount);
 	std::cout << " F(X)=" << value << std::endl;
 	FreeLibrary(NelderMeadLib);
 }

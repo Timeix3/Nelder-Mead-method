@@ -17,7 +17,7 @@
 mono_crash.*
 
 # Build results
-[Dd]ebug/
+#[Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
@@ -27,7 +27,7 @@ x86/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
-[Bb]in/
+#[Bb]in/
 [Oo]bj/
 [Oo]ut/
 [Ll]og/
@@ -362,3 +362,8 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /NVM1/log.txt
+/NelderMeadUI/bin/Debug/net8.0-windows/NelderMeadUI.deps.json
+/NelderMeadUI/bin/Debug/net8.0-windows/NelderMeadUI.dll
+/NelderMeadUI/bin/Debug/net8.0-windows/NelderMeadUI.exe
+/NelderMeadUI/bin/Debug/net8.0-windows/NelderMeadUI.runtimeconfig.json
+/NelderMeadUI/bin/Debug/net8.0-windows/log.txt
