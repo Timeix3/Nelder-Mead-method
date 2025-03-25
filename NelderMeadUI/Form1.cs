@@ -16,7 +16,7 @@ namespace NelderMeadUI
         private void buttonStart_Click(object sender, EventArgs e)
         {
             string function = textBox1.Text;
-            int varsCount = (int)numericUpDown1.Value;
+            int varsCount = getVariablesCount(function);
             string[] coordinateString = textBox2.Text.Split(',');
             double[] startingPoint = coordinateString.Select(double.Parse).ToArray();
             //string functionRosenbrock = "(1-x1)^2+100*(x2-x1^2)^2";
@@ -31,6 +31,13 @@ namespace NelderMeadUI
                 label1.Text += $"X{i+1}=" + result[i].ToString() + "\n";
             }
             label1.Text += "F(X)=" + res.ToString();
+        }
+        private int getVariablesCount(string function)
+        {
+            int varsCount = 1;
+            for (int i = 0; i < function.Length; i++)
+                if (function[i] == 'x' && varsCount < (function[i + 1] - '0')) varsCount = function[i + 1] - '0';
+            return varsCount;
         }
     }
 }
