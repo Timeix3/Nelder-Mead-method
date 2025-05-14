@@ -3,41 +3,71 @@ using System.Text.Json;
 
 namespace NelderMeadUI
 {
-    public partial class Form1 : Form
+    public partial class FormMain : Form
     {
+        public delegate void PointsCallback(IntPtr pointPtr);
         [DllImport("NelderMeadDll.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern double evaluateFunctionImport(double[] point, int size, [MarshalAs(UnmanagedType.LPStr)] string function);
         [DllImport("NelderMeadDll.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr findFunctionMinimum(int varsCount, double[] startingPoint, [MarshalAs(UnmanagedType.LPStr)] string function);
-
+        public static extern IntPtr findFunctionMinimum(PointsCallback callback, int varsCount, double[] startingPoint, [MarshalAs(UnmanagedType.LPStr)] string function);
+        
         private Point[][] triangles;
         private int currentTriangleIndex = -1; // индекс текущего рисуемого треугольника
         private System.Windows.Forms.Timer timer; // таймер для переключения треугольников
-        public Form1()
+        public FormMain()
         {
             InitializeComponent();
         }
-
-        private void buttonStart_Click(object sender, EventArgs e)
+        int varsCount;
+        private void ButtonStart_Click(object sender, EventArgs e)
         {
-            string function = textBox1.Text;
-            int varsCount = getVariablesCount(function);
-            string[] coordinateString = textBox2.Text.Split(',');
-            double[] startingPoint = coordinateString.Select(double.Parse).ToArray();
+            labelResult.Text = "";
+            string function = textBoxFunction.Text;
+            varsCount = GetVariablesCount(function);
+            string[] coordinateString = textBoxPoint.Text.Split(',');
+            double[] startingPoint;
+            try
+            {
+                startingPoint = coordinateString.Select(double.Parse).ToArray();
+                if (startingPoint.Length != varsCount) throw new Exception();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Invalid point", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             //string functionRosenbrock = "(1-x1)^2+100*(x2-x1^2)^2";
             //string functionHimmelblau = "(x1^2+x2-11)^2+(x1+x2^2-7)^2";
             //string function3Variables = "x1^2+x2^2+x3^2";
-            IntPtr ptr = findFunctionMinimum(varsCount, startingPoint, function);
+            PointsCallback callback = new PointsCallback(GetPoint);
+            IntPtr ptr = 0;
             double[] result = new double[varsCount];
-            Marshal.Copy(ptr, result, 0, varsCount);
-            double res = evaluateFunctionImport(result, varsCount, function);
+            double res;
+            try
+            {
+                ptr = findFunctionMinimum(callback, varsCount, startingPoint, function);
+                Marshal.Copy(ptr, result, 0, varsCount);
+                res = evaluateFunctionImport(result, varsCount, function);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Invalid expression", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             for (int i = 0; i < varsCount; i++)
             {
-                label1.Text += $"X{i + 1}=" + result[i].ToString() + "\n";
+                labelResult.Text += $"X{i + 1}=" + result[i].ToString() + "\n";
             }
-            label1.Text += "F(X)=" + res.ToString();
+            labelResult.Text += "F(X)=" + res.ToString();
         }
-        private int getVariablesCount(string function)
+        List<double[]> points = new();
+        private void GetPoint(IntPtr pointPtr)
+        {
+            double[] point = new double[varsCount];
+            Marshal.Copy(pointPtr, point, 0, varsCount);
+            points.Add(point);
+        }
+        private int GetVariablesCount(string function)
         {
             int varsCount = 1;
             for (int i = 0; i < function.Length; i++)
