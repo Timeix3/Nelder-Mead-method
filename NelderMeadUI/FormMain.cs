@@ -1,5 +1,8 @@
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using ScottPlot;
+using ScottPlot.WinForms;
 
 namespace NelderMeadUI
 {
@@ -10,14 +13,64 @@ namespace NelderMeadUI
         public static extern double evaluateFunctionImport(double[] point, int size, [MarshalAs(UnmanagedType.LPStr)] string function);
         [DllImport("NelderMeadDll.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr findFunctionMinimum(PointsCallback callback, int varsCount, double[] startingPoint, [MarshalAs(UnmanagedType.LPStr)] string function);
-        
-        private Point[][] triangles;
-        private int currentTriangleIndex = -1; // индекс текущего рисуемого треугольника
-        private System.Windows.Forms.Timer timer; // таймер для переключения треугольников
+
+        private readonly FormsPlot _formsPlot;
+
+        private readonly System.Windows.Forms.Timer _timer;
+
+        private readonly List<double[]> _points = new();
+
+        private int _currentTriangleIndex;
+
         public FormMain()
         {
             InitializeComponent();
+
+            _formsPlot = new FormsPlot() { Dock = DockStyle.Fill };
+
+            panel1.Controls.Add(_formsPlot);
+
+            _points = new List<double[]>();
+
+            _currentTriangleIndex = 0;
+
+            _timer = new System.Windows.Forms.Timer();
+            _timer.Interval = 100;
+            _timer.Tick += Timer_Tick;
         }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            if (_currentTriangleIndex < _points.Count - 2)
+            {
+                List<double> triangleList =
+                [
+                    .. _points[_currentTriangleIndex],
+                    .. _points[_currentTriangleIndex + 1],
+                    .. _points[_currentTriangleIndex + 2],
+                ];
+
+                DrawTriangle([.. triangleList]);
+                _currentTriangleIndex+=3;
+            }
+            else
+            {
+                _timer.Stop();
+                _timer.Dispose();
+            }
+        }
+        private void DrawTriangle(double[] trianglePoints)
+        {
+            _formsPlot.Plot.Clear();
+
+            double[] dataX = { trianglePoints[0], trianglePoints[2], trianglePoints[4], trianglePoints[0] };
+            double[] dataY = { trianglePoints[1], trianglePoints[3], trianglePoints[5], trianglePoints[1] };
+
+            _formsPlot.Plot.Add.Scatter(dataX, dataY);
+
+            _formsPlot.Refresh();
+        }
+
         int varsCount;
         private void ButtonStart_Click(object sender, EventArgs e)
         {
@@ -59,13 +112,18 @@ namespace NelderMeadUI
                 labelResult.Text += $"X{i + 1}=" + result[i].ToString() + "\n";
             }
             labelResult.Text += "F(X)=" + res.ToString();
+
+            if (varsCount == 2)
+            {
+                _timer.Start();
+            }
         }
-        List<double[]> points = new();
+        
         private void GetPoint(IntPtr pointPtr)
         {
             double[] point = new double[varsCount];
             Marshal.Copy(pointPtr, point, 0, varsCount);
-            points.Add(point);
+            _points.Add(point);
         }
         private int GetVariablesCount(string function)
         {
@@ -73,52 +131,6 @@ namespace NelderMeadUI
             for (int i = 0; i < function.Length; i++)
                 if (function[i] == 'x' && varsCount < (function[i + 1] - '0')) varsCount = function[i + 1] - '0';
             return varsCount;
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            triangles = LoadTriangles("triangles.json");
-
-            timer = new System.Windows.Forms.Timer
-            {
-                Interval = 200
-            };
-            timer.Tick += Timer_Tick;
-            timer.Start();
-
-            pictureBox1.Paint += DrawingPanel_Paint;
-        }
-
-        private Point[][] LoadTriangles(string filePath)
-        {
-            if (!File.Exists(filePath))
-                return null;
-
-      
-            string json = File.ReadAllText(filePath);
-
-            return JsonSerializer.Deserialize<Point[][]>(json);
-        }
-
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            currentTriangleIndex++;
-            if (currentTriangleIndex >= triangles.Length)
-            {
-                timer.Stop();
-            }
-            else
-            {
-                pictureBox1.Invalidate();
-            }            
-        }
-
-        private void DrawingPanel_Paint(object sender, PaintEventArgs e)
-        {
-            // Получаем текущий треугольник
-            Point[] currentTriangle = triangles[currentTriangleIndex];
-
-            e.Graphics.DrawPolygon(Pens.Black, currentTriangle); // Обводим треугольник
         }
     }
 }

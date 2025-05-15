@@ -34,16 +34,15 @@
             label2 = new Label();
             label4 = new Label();
             textBoxPoint = new TextBox();
-            button1 = new Button();
-            pictureBox1 = new PictureBox();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            panel1 = new Panel();
             SuspendLayout();
             // 
             // buttonStart
             // 
-            buttonStart.Location = new Point(85, 372);
+            buttonStart.Location = new Point(33, 542);
+            buttonStart.Margin = new Padding(3, 4, 3, 4);
             buttonStart.Name = "buttonStart";
-            buttonStart.Size = new Size(134, 23);
+            buttonStart.Size = new Size(210, 45);
             buttonStart.TabIndex = 0;
             buttonStart.Text = "Запустить алгоритм";
             buttonStart.UseVisualStyleBackColor = true;
@@ -52,82 +51,70 @@
             // labelResult
             // 
             labelResult.AutoSize = true;
-            labelResult.Location = new Point(560, 54);
+            labelResult.Location = new Point(635, 30);
             labelResult.Name = "labelResult";
-            labelResult.Size = new Size(0, 15);
+            labelResult.Size = new Size(0, 20);
             labelResult.TabIndex = 1;
             // 
             // textBoxFunction
             // 
-            textBoxFunction.Location = new Point(140, 51);
+            textBoxFunction.Location = new Point(209, 30);
+            textBoxFunction.Margin = new Padding(3, 4, 3, 4);
             textBoxFunction.Name = "textBoxFunction";
-            textBoxFunction.Size = new Size(222, 23);
+            textBoxFunction.Size = new Size(253, 27);
             textBoxFunction.TabIndex = 2;
             textBoxFunction.Text = "(1-x1)^2+100*(x2-x1^2)^2";
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(37, 54);
+            label2.Location = new Point(33, 30);
             label2.Name = "label2";
-            label2.Size = new Size(58, 15);
+            label2.Size = new Size(72, 20);
             label2.TabIndex = 3;
             label2.Text = "Функция:";
             // 
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(37, 108);
+            label4.Location = new Point(33, 79);
             label4.Name = "label4";
-            label4.Size = new Size(104, 15);
+            label4.Size = new Size(130, 20);
             label4.TabIndex = 6;
             label4.Text = "Начальная точка:";
             // 
             // textBoxPoint
             // 
-            textBoxPoint.Location = new Point(262, 105);
+            textBoxPoint.Location = new Point(209, 72);
+            textBoxPoint.Margin = new Padding(3, 4, 3, 4);
             textBoxPoint.Name = "textBoxPoint";
-            textBoxPoint.Size = new Size(100, 23);
+            textBoxPoint.Size = new Size(114, 27);
             textBoxPoint.TabIndex = 7;
             textBoxPoint.Text = "0, 0";
             // 
-            // button1
+            // panel1
             // 
-            button1.Location = new Point(572, 362);
-            button1.Margin = new Padding(3, 2, 3, 2);
-            button1.Name = "button1";
-            button1.Size = new Size(145, 43);
-            button1.TabIndex = 8;
-            button1.Text = "Запустить пробную версию";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            panel1.BackColor = SystemColors.ActiveCaption;
+            panel1.Location = new Point(33, 126);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(842, 394);
+            panel1.TabIndex = 10;
             // 
-            // pictureBox1
+            // FormMain
             // 
-            pictureBox1.BackColor = SystemColors.ActiveCaption;
-            pictureBox1.Location = new Point(164, 142);
-            pictureBox1.Margin = new Padding(3, 2, 3, 2);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(504, 196);
-            pictureBox1.TabIndex = 9;
-            pictureBox1.TabStop = false;
-            // 
-            // Form1
-            // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
-            Controls.Add(pictureBox1);
-            Controls.Add(button1);
+            ClientSize = new Size(914, 600);
+            Controls.Add(panel1);
             Controls.Add(textBoxPoint);
             Controls.Add(label4);
             Controls.Add(label2);
             Controls.Add(textBoxFunction);
             Controls.Add(labelResult);
             Controls.Add(buttonStart);
-            Name = "Form1";
+            Margin = new Padding(3, 4, 3, 4);
+            Name = "FormMain";
             Text = "Метод Нелдера-Мида";
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -140,7 +127,6 @@
         private Label label2;
         private Label label4;
         private TextBox textBoxPoint;
-        private Button button1;
-        private PictureBox pictureBox1;
+        private Panel panel1;
     }
 }
