@@ -367,3 +367,5 @@ FodyWeavers.xsd
 /NelderMeadUI/bin/Debug/net8.0-windows/NelderMeadUI.exe
 /NelderMeadUI/bin/Debug/net8.0-windows/NelderMeadUI.runtimeconfig.json
 /NelderMeadUI/bin/Debug/net8.0-windows/log.txt
+/NelderMeadUI/bin/Debug/net8.0-windows
+/TestsForMethod/bin/Debug/net8.0-windows

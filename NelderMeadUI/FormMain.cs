@@ -1,8 +1,11 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using ScottPlot;
 using ScottPlot.WinForms;
+
+[assembly: InternalsVisibleTo("TestsForMethod")]
 
 namespace NelderMeadUI
 {
@@ -18,7 +21,7 @@ namespace NelderMeadUI
 
         private readonly System.Windows.Forms.Timer _timer;
 
-        private readonly List<double[]> _points = new();
+        internal readonly List<double[]> _points = new();
 
         private int _currentTriangleIndex;
 
@@ -71,7 +74,9 @@ namespace NelderMeadUI
             _formsPlot.Refresh();
         }
 
-        int varsCount;
+        public int varsCount;
+
+        
         private void ButtonStart_Click(object sender, EventArgs e)
         {
             labelResult.Text = "";
@@ -119,18 +124,56 @@ namespace NelderMeadUI
             }
         }
         
-        private void GetPoint(IntPtr pointPtr)
+        internal void GetPoint(IntPtr pointPtr)
         {
             double[] point = new double[varsCount];
             Marshal.Copy(pointPtr, point, 0, varsCount);
             _points.Add(point);
         }
-        private int GetVariablesCount(string function)
+
+        internal int GetVariablesCount(string function)
         {
             int varsCount = 1;
             for (int i = 0; i < function.Length; i++)
                 if (function[i] == 'x' && varsCount < (function[i + 1] - '0')) varsCount = function[i + 1] - '0';
             return varsCount;
+        }
+
+        public interface INelderMeadSolverForDLL
+        {
+            double EvaluateFunction(double[] point, int dimensions, string function);
+        }
+
+        public interface INelderMeadSolver
+        {
+            IntPtr FindMinimum(PointsCallback callback, int varsCount, double[] startPoint, string function);
+        }
+
+        private readonly INelderMeadSolver _solver;
+
+        public FormMain(INelderMeadSolver solver = null)
+        {
+            _solver = solver ?? new DefaultSolver();                                         
+        }
+
+        public double[] FindFunctionMinimum(string function, double[] startingPoint)
+        {
+            PointsCallback callback = GetPoint;
+            IntPtr ptr = _solver.FindMinimum(callback, startingPoint.Length, startingPoint, function);
+            double[] result = new double[startingPoint.Length];
+            Marshal.Copy(ptr, result, 0, startingPoint.Length);
+            return result;
+        }
+        
+        public class DefaultSolver : INelderMeadSolver
+        {
+            public IntPtr FindMinimum(PointsCallback callback, int varsCount, double[] startPoint, string function)
+            {
+                return findFunctionMinimum(callback, varsCount, startPoint, function);
+            }
+
+            [DllImport("NelderMeadDll.dll")]
+            private static extern IntPtr findFunctionMinimum(PointsCallback callback, int varsCount, double[] startPoint, string function);
         }
     }
 }
