@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using System.Windows.Forms;
 using ScottPlot;
 using ScottPlot.WinForms;
 
@@ -31,8 +32,7 @@ namespace NelderMeadUI
 
             _formsPlot = new FormsPlot() { Dock = DockStyle.Fill };
 
-            panel1.Controls.Add(_formsPlot);
-
+            panel.Controls.Add(_formsPlot);
             _points = new List<double[]>();
 
             _currentTriangleIndex = 0;
@@ -52,31 +52,48 @@ namespace NelderMeadUI
                     .. _points[_currentTriangleIndex + 1],
                     .. _points[_currentTriangleIndex + 2],
                 ];
-
-                DrawTriangle([.. triangleList]);
-                _currentTriangleIndex+=3;
+                _formsPlot.Plot.Clear();
+                DrawPath(_points.Take(_currentTriangleIndex).SelectMany(x => x).ToList());
+                DrawTriangle(triangleList);
+                _formsPlot.Refresh();
+                _currentTriangleIndex += 3;
             }
             else
             {
                 _timer.Stop();
                 _timer.Dispose();
+                textBoxFunction.Enabled = true;
+                textBoxPoint.Enabled = true;
+                buttonStart.Enabled = true;
             }
         }
-        private void DrawTriangle(double[] trianglePoints)
+
+        private void DrawPath(List<double> trianglePoints)
         {
-            _formsPlot.Plot.Clear();
+            if (trianglePoints.Count == 0) return;
+            for (int i = 0; i < trianglePoints.Count / 6; i++)
+            {
+                double[] dataX = { trianglePoints[0 + 6 * i], trianglePoints[2 + 6 * i], trianglePoints[4 + 6 * i], trianglePoints[0 + 6 * i] };
+                double[] dataY = { trianglePoints[1 + 6 * i], trianglePoints[3 + 6 * i], trianglePoints[5 + 6 * i], trianglePoints[1 + 6 * i] };
+
+                var scatter = _formsPlot.Plot.Add.Scatter(dataX, dataY);
+                scatter.Color = ScottPlot.Color.FromARGB(838926080);
+            }
+        }
+
+        private void DrawTriangle(List<double> trianglePoints)
+        {
 
             double[] dataX = { trianglePoints[0], trianglePoints[2], trianglePoints[4], trianglePoints[0] };
             double[] dataY = { trianglePoints[1], trianglePoints[3], trianglePoints[5], trianglePoints[1] };
 
-            _formsPlot.Plot.Add.Scatter(dataX, dataY);
-
-            _formsPlot.Refresh();
+            var scatter = _formsPlot.Plot.Add.Scatter(dataX, dataY);
+            scatter.Color = ScottPlot.Colors.Red;
+            scatter.LineWidth = 3;
         }
 
         public int varsCount;
 
-        
         private void ButtonStart_Click(object sender, EventArgs e)
         {
             labelResult.Text = "";
@@ -120,10 +137,19 @@ namespace NelderMeadUI
 
             if (varsCount == 2)
             {
+                textBoxFunction.Enabled = false;
+                textBoxPoint.Enabled = false;
+                buttonStart.Enabled = false;
+                double viewSize = 10;
+                _formsPlot.Plot.Axes.SetLimits(
+                    startingPoint[0] - viewSize / 2,
+                    startingPoint[0] + viewSize / 2,
+                    startingPoint[1] - viewSize / 2,
+                    startingPoint[1] + viewSize / 2);
                 _timer.Start();
             }
         }
-        
+
         internal void GetPoint(IntPtr pointPtr)
         {
             double[] point = new double[varsCount];

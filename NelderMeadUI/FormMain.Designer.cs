@@ -34,11 +34,12 @@
             label2 = new Label();
             label4 = new Label();
             textBoxPoint = new TextBox();
-            panel1 = new Panel();
+            panel = new Panel();
             SuspendLayout();
             // 
             // buttonStart
             // 
+            buttonStart.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             buttonStart.Location = new Point(33, 542);
             buttonStart.Margin = new Padding(3, 4, 3, 4);
             buttonStart.Name = "buttonStart";
@@ -50,6 +51,7 @@
             // 
             // labelResult
             // 
+            labelResult.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             labelResult.AutoSize = true;
             labelResult.Location = new Point(635, 30);
             labelResult.Name = "labelResult";
@@ -63,7 +65,7 @@
             textBoxFunction.Name = "textBoxFunction";
             textBoxFunction.Size = new Size(253, 27);
             textBoxFunction.TabIndex = 2;
-            textBoxFunction.Text = "(1-x1)^2+100*(x2-x1^2)^2";
+            textBoxFunction.Text = "x1^2+x2^2";
             // 
             // label2
             // 
@@ -90,22 +92,23 @@
             textBoxPoint.Name = "textBoxPoint";
             textBoxPoint.Size = new Size(114, 27);
             textBoxPoint.TabIndex = 7;
-            textBoxPoint.Text = "0, 0";
+            textBoxPoint.Text = "10, 10";
             // 
-            // panel1
+            // panel
             // 
-            panel1.BackColor = SystemColors.ActiveCaption;
-            panel1.Location = new Point(33, 126);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(842, 394);
-            panel1.TabIndex = 10;
+            panel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            panel.BackColor = SystemColors.ActiveCaption;
+            panel.Location = new Point(33, 126);
+            panel.Name = "panel";
+            panel.Size = new Size(842, 394);
+            panel.TabIndex = 10;
             // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(914, 600);
-            Controls.Add(panel1);
+            Controls.Add(panel);
             Controls.Add(textBoxPoint);
             Controls.Add(label4);
             Controls.Add(label2);
@@ -127,6 +130,6 @@
         private Label label2;
         private Label label4;
         private TextBox textBoxPoint;
-        private Panel panel1;
+        private Panel panel;
     }
 }
