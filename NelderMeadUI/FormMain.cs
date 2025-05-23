@@ -14,7 +14,7 @@ namespace NelderMeadUI
     {
         public delegate void PointsCallback(IntPtr pointPtr);
         [DllImport("NelderMeadDll.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern double evaluateFunctionImport(double[] point, int size, [MarshalAs(UnmanagedType.LPStr)] string function);
+        public static extern double evaluateFunction(double[] point, int size, [MarshalAs(UnmanagedType.LPStr)] string function);
         [DllImport("NelderMeadDll.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr findFunctionMinimum(PointsCallback callback, int varsCount, double[] startingPoint, [MarshalAs(UnmanagedType.LPStr)] string function);
 
@@ -29,14 +29,9 @@ namespace NelderMeadUI
         public FormMain()
         {
             InitializeComponent();
-
             _formsPlot = new FormsPlot() { Dock = DockStyle.Fill };
-
             panel.Controls.Add(_formsPlot);
             _points = new List<double[]>();
-
-            _currentTriangleIndex = 0;
-
             _timer = new System.Windows.Forms.Timer();
             _timer.Interval = 100;
             _timer.Tick += Timer_Tick;
@@ -75,7 +70,6 @@ namespace NelderMeadUI
             {
                 double[] dataX = { trianglePoints[0 + 6 * i], trianglePoints[2 + 6 * i], trianglePoints[4 + 6 * i], trianglePoints[0 + 6 * i] };
                 double[] dataY = { trianglePoints[1 + 6 * i], trianglePoints[3 + 6 * i], trianglePoints[5 + 6 * i], trianglePoints[1 + 6 * i] };
-
                 var scatter = _formsPlot.Plot.Add.Scatter(dataX, dataY);
                 scatter.Color = ScottPlot.Color.FromARGB(838926080);
             }
@@ -83,24 +77,67 @@ namespace NelderMeadUI
 
         private void DrawTriangle(List<double> trianglePoints)
         {
-
             double[] dataX = { trianglePoints[0], trianglePoints[2], trianglePoints[4], trianglePoints[0] };
             double[] dataY = { trianglePoints[1], trianglePoints[3], trianglePoints[5], trianglePoints[1] };
-
             var scatter = _formsPlot.Plot.Add.Scatter(dataX, dataY);
             scatter.Color = ScottPlot.Colors.Red;
             scatter.LineWidth = 3;
         }
 
         public int varsCount;
-
         private void ButtonStart_Click(object sender, EventArgs e)
         {
+            _points.Clear();
+            _currentTriangleIndex = 0;
             labelResult.Text = "";
             string function = textBoxFunction.Text;
             varsCount = GetVariablesCount(function);
-            string[] coordinateString = textBoxPoint.Text.Split(',');
             double[] startingPoint;
+            if (!ValidatePoint(out startingPoint)) return;
+            if (!GetResult(function, startingPoint)) return;
+            if (varsCount == 2)
+            {
+                textBoxFunction.Enabled = false;
+                textBoxPoint.Enabled = false;
+                buttonStart.Enabled = false;
+                _timer.Start();
+            }
+        }
+
+        private bool GetResult(string function, double[] startingPoint)
+        {
+            PointsCallback callback = null;
+            if (varsCount == 2) callback = new PointsCallback(GetPoint);
+            IntPtr ptr = 0;
+            double[] resultPoint = new double[varsCount];
+            double resultValue;
+            try
+            {
+                ptr = findFunctionMinimum(callback, varsCount, startingPoint, function);
+                Marshal.Copy(ptr, resultPoint, 0, varsCount);
+                resultValue = evaluateFunction(resultPoint, varsCount, function);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Invalid expression", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            ShowResult(resultPoint, resultValue);
+            return true;
+        }
+
+        private void ShowResult(double[] resultPoint, double resultValue)
+        {
+            for (int i = 0; i < varsCount; i++)
+            {
+                labelResult.Text += $"X{i + 1}=" + resultPoint[i].ToString() + "\n";
+            }
+            labelResult.Text += "F(X)=" + resultValue.ToString();
+        }
+
+        private bool ValidatePoint(out double[] startingPoint)
+        {
+            string[] coordinateString = textBoxPoint.Text.Split(',');
             try
             {
                 startingPoint = coordinateString.Select(double.Parse).ToArray();
@@ -109,45 +146,10 @@ namespace NelderMeadUI
             catch (Exception)
             {
                 MessageBox.Show("Invalid point", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                startingPoint = null;
+                return false;
             }
-            //string functionRosenbrock = "(1-x1)^2+100*(x2-x1^2)^2";
-            //string functionHimmelblau = "(x1^2+x2-11)^2+(x1+x2^2-7)^2";
-            //string function3Variables = "x1^2+x2^2+x3^2";
-            PointsCallback callback = new PointsCallback(GetPoint);
-            IntPtr ptr = 0;
-            double[] result = new double[varsCount];
-            double res;
-            try
-            {
-                ptr = findFunctionMinimum(callback, varsCount, startingPoint, function);
-                Marshal.Copy(ptr, result, 0, varsCount);
-                res = evaluateFunctionImport(result, varsCount, function);
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Invalid expression", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            for (int i = 0; i < varsCount; i++)
-            {
-                labelResult.Text += $"X{i + 1}=" + result[i].ToString() + "\n";
-            }
-            labelResult.Text += "F(X)=" + res.ToString();
-
-            if (varsCount == 2)
-            {
-                textBoxFunction.Enabled = false;
-                textBoxPoint.Enabled = false;
-                buttonStart.Enabled = false;
-                double viewSize = 10;
-                _formsPlot.Plot.Axes.SetLimits(
-                    startingPoint[0] - viewSize / 2,
-                    startingPoint[0] + viewSize / 2,
-                    startingPoint[1] - viewSize / 2,
-                    startingPoint[1] + viewSize / 2);
-                _timer.Start();
-            }
+            return true;
         }
 
         internal void GetPoint(IntPtr pointPtr)
