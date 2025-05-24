@@ -1,0 +1,9 @@
+{
+    "contractionCoeff": 0.5,
+    "eps": 0.001,
+    "expansionCoeff": 2.0,
+    "maxSteps": 500,
+    "outputType": "html",
+    "reflectionCoeff": 1.0,
+    "scale": 1.0
+}

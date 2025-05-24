@@ -367,5 +367,15 @@ FodyWeavers.xsd
 /NelderMeadUI/bin/Debug/net8.0-windows/NelderMeadUI.exe
 /NelderMeadUI/bin/Debug/net8.0-windows/NelderMeadUI.runtimeconfig.json
 /NelderMeadUI/bin/Debug/net8.0-windows/log.txt
-/NelderMeadUI/bin/Debug/net8.0-windows
 /TestsForMethod/bin/Debug/net8.0-windows
+/NelderMeadUI/bin/Debug/net8.0-windows/runtimes
+/NelderMeadUI/bin/Debug/net8.0-windows/HarfBuzzSharp.dll
+/NelderMeadUI/bin/Debug/net8.0-windows/OpenTK.dll
+/NelderMeadUI/bin/Debug/net8.0-windows/OpenTK.GLControl.dll
+/NelderMeadUI/bin/Debug/net8.0-windows/ScottPlot.dll
+/NelderMeadUI/bin/Debug/net8.0-windows/ScottPlot.WinForms.dll
+/NelderMeadUI/bin/Debug/net8.0-windows/SkiaSharp.dll
+/NelderMeadUI/bin/Debug/net8.0-windows/SkiaSharp.HarfBuzz.dll
+/NelderMeadUI/bin/Debug/net8.0-windows/SkiaSharp.Views.Desktop.Common.dll
+/NelderMeadUI/bin/Debug/net8.0-windows/SkiaSharp.Views.WindowsForms.dll
+/NelderMeadUI/bin/Debug/net8.0-windows/log.html
